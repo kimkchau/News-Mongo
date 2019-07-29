@@ -26,7 +26,7 @@ app.use(express.json());
 // Make public a static folder
 app.use(express.static("public"));
 
-// Connect to the Mongo DB
+// Connect to the Mongo DB 
 mongoose.connect("mongodb://localhost/News", { useNewUrlParser: true });
 
 // Routes
@@ -34,22 +34,29 @@ mongoose.connect("mongodb://localhost/News", { useNewUrlParser: true });
 // A GET route for scraping the CBC News website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with axios
-  axios.get("https://www.cbc.ca/news/canada/toronto").then(function(response) {
+  axios.get("https://www.washingtonpost.com/").then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
 
     // Now, we grab every h3 within an headline tag, and do the following:
-    $("article h2").each(function(i, element) {
+    $(".headline").each(function(i, element) {
       // Save an empty result object
       var result = {};
 
-      // Add the text and href of every link, and save them as properties of the result object
+      // Add the headline, summary, and href of every link, and save them as properties of the result object
       result.title = $(this)
         .children("a")
         .text();
       result.link = $(this)
         .children("a")
         .attr("href");
+      result.summary = $(this)
+        .next(".blurb")
+        .text();
+
+console.log(result.title);
+console.log(result.summary);
+console.log(result.link);
 
       // Create a new Article using the `result` object built from scraping
       db.Article.create(result)

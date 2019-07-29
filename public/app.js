@@ -1,4 +1,4 @@
-$("#articles").empty();
+
 // Grab the articles as a json
 $.getJSON("/articles", function(data) {
   
